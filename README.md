@@ -2,7 +2,20 @@
 
 > 친구들과 돈을 벌어 탈출하세요. 단, 당신 중 한 명은 감염되어 있을 수 있습니다.
 
-> 소개영상 [YouTube](아직없음)
+## 이 포크에 대해 (김현준 · KHJ)
+
+이 저장소는 3인 팀 프로젝트 [Jinnnyjin/Infectstellar_NetworkTeamProject](https://github.com/Jinnnyjin/Infectstellar_NetworkTeamProject)의 개인 포크입니다. 제가 맡은 부분의 설계 판단과 트러블슈팅은 **[상세 문서](https://enzeun.github.io/projects/infectstella.html)**에 정리했습니다.
+
+| 항목 | 내용 |
+| --- | --- |
+| 담당 | 로비 · 게임 진행 · UI · Firebase 백엔드 · 시스템 통합 |
+| 내 코드 | `Infectstellar/Assets/KHJ/Scripts` (19개 파일, 약 3,800줄) · 커밋 114개 (merge 제외) |
+| 먼저 볼 파일 | `Game/GameManager.cs`: 마스터 권한 기반 동기화(요청 → 검증 → 전체 적용), 게임 FSM, 감염, 정산<br>`Loading/LoadingHelper.cs`: 전원 로딩 완료 확인 후 씬 활성화, 타임아웃<br>`Photon/PhotonLinkManager.cs`: 로비 · 방 · Custom Properties<br>`Firebase/FirebaseLinkManager.cs`: 익명 인증 · 닉네임 · 랭킹 |
+| 플레이 | [itch.io](https://enzeun.itch.io/infectstella) |
+| 포트폴리오 | [enzeun.github.io](https://enzeun.github.io) |
+
+아래는 팀이 함께 작성한 원본 README입니다.
+
 ---
 
 ## 1. 프로젝트 개요
