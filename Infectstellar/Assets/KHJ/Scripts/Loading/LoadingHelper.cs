@@ -125,14 +125,12 @@ namespace ENZEUN.Runtime
 
             try
             {
-                // 3. 300초 대기 중 취소 토큰 및 bool 조건 감지
-                // 지정된 시간 동안 기다리거나, 조건이 참이 될 때까지 대기
+                // 120초 안에 전원 로딩 완료(취소 요청)가 오지 않으면 Timeout 이 TimeoutException 을 던집니다.
                 await UniTask.WaitUntil(() => _isCancelRequested, cancellationToken: linkedCts.Token)
                     .Timeout(TimeSpan.FromSeconds(120));
-
-                // 만약 단순 시간 초과만 원하고 bool 조건도 함께 체크하고 싶다면 아래와 같이 작성할 수도 있습니다.
-                // await UniTask.WaitForSeconds(300, cancellationToken: linkedCts.Token);
-
+            }
+            catch (TimeoutException)
+            {
                 MMLoadingSceneDebug("시간이 초과되었습니다. 메인화면으로 돌아갑니다.");
                 SceneManager.LoadScene("TitleScene");
             }
@@ -142,6 +140,8 @@ namespace ENZEUN.Runtime
             }
             finally
             {
+                // 시간 초과 후에도 WaitUntil 이 계속 돌지 않도록 취소한 뒤 해제합니다.
+                linkedCts.Cancel();
                 linkedCts.Dispose();
             }
         }

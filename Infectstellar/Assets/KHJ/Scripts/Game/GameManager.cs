@@ -522,7 +522,7 @@ namespace ENZEUN.Runtime
                     int deadCount = 0;
                     foreach (var playerData in playerDataDict.Values)
                     {
-                        // 감염된 플레이어가 죽었으면, 보너스 30%
+                        // 감염된 플레이어가 죽었으면, 보너스 40%
                         if (playerData.isInfected && playerData.isDead)
                         {
                             killInfectedBonusGold = (int)Mathf.Round(originGold * 0.4f);
@@ -638,20 +638,18 @@ namespace ENZEUN.Runtime
                 if (!data.isDead)
                 {
                     countOfAlivedPlayers++;
-                    if (isInfected)
+                    // 전역 플래그가 아니라 살아 있는 이 플레이어가 감염자인지 확인합니다.
+                    if (data.isInfected)
                     {
                         infectedPlayerAlive = true;
                     }
                 }
             }
 
-
-            if (countOfAlivedPlayers == 1)
+            // 감염자 혼자 살아남았을 때만 감염자 승리, 그 외(일반 생존자 1명 포함)는 탈출 성공입니다.
+            if (countOfAlivedPlayers == 1 && infectedPlayerAlive)
             {
-                if (infectedPlayerAlive)
-                {
-                    gameEndType = GameEndType.InfectedWin;
-                }
+                gameEndType = GameEndType.InfectedWin;
             }
             else
             {
@@ -823,22 +821,23 @@ namespace ENZEUN.Runtime
         {
             var token = this.GetCancellationTokenOnDestroy();
 
-            await UniTask.Delay(TimeSpan.FromMinutes(minInfectionTime));
-
-            TryInfectPlayer();
-
-            while (!token.IsCancellationRequested || !isInfected)
+            try
             {
-                try
-                {
-                    await UniTask.Delay(TimeSpan.FromMinutes(InfectionInterval));
-                }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
+                await UniTask.Delay(TimeSpan.FromMinutes(minInfectionTime), cancellationToken: token);
 
                 TryInfectPlayer();
+
+                // 파괴되지 않았고 아직 감염자가 없을 때만 반복합니다. (감염자가 생기면 종료)
+                while (!token.IsCancellationRequested && !isInfected)
+                {
+                    await UniTask.Delay(TimeSpan.FromMinutes(InfectionInterval), cancellationToken: token);
+
+                    TryInfectPlayer();
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // GameManager 가 파괴되면 감염 타이머를 종료합니다.
             }
         }
 
